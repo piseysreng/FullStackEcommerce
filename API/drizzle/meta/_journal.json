@@ -36,6 +36,13 @@
       "when": 1761461100962,
       "tag": "0004_nice_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1761470578704,
+      "tag": "0005_careful_nekra",
+      "breakpoints": true
     }
   ]
 }
