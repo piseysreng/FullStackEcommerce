@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "priceTest" double precision NOT NULL;

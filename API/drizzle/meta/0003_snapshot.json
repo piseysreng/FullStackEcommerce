@@ -1,6 +1,6 @@
 {
-  "id": "917503d6-5db3-4d06-a039-2615c20bf4c7",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "9f792094-cc29-4a97-bf8d-32eb83345b65",
+  "prevId": "32a34ec4-83a6-4244-bcdb-042b7089e6c9",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -48,6 +48,25 @@
           "type": "double precision",
           "primaryKey": false,
           "notNull": true
+        },
+        "priceTest": {
+          "name": "priceTest",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priceAnotherTest": {
+          "name": "priceAnotherTest",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
         }
       },
       "indexes": {},
