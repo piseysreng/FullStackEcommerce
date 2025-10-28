@@ -43,6 +43,13 @@
       "when": 1761470578704,
       "tag": "0005_careful_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1761619172774,
+      "tag": "0006_complete_spectrum",
+      "breakpoints": true
     }
   ]
 }
