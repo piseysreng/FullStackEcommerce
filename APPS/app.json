@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "ecommerce-mobile",
-    "slug": "ecommerce-mobile",
-    "scheme": "notjust-ecom",
+    "name": "APPS",
+    "slug": "APPS",
+    "scheme": "your-app-scheme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
