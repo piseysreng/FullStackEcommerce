@@ -18,7 +18,7 @@ app.use(cors({
 
 
 app.get('/', (req, res) => {
-    res.send('Hello World! Pisey Sreng');
+    res.send('Hello World! Pisey Sreng Hehe');
 });
 
 app.use('/products', productsRoutes);
