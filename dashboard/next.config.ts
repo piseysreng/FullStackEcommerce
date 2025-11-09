@@ -9,5 +9,4 @@ const nextConfig = {
   },
   transpilePackages: [],
 };
-
 export default withGluestackUI(nextConfig);

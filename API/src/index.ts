@@ -1,12 +1,20 @@
 import express, { json, urlencoded } from 'express';
+import cors from 'cors';
 import productsRoutes from './routes/products/index.js';
 import authRoutes from './routes/auth/index.js';
 import ordersRoutes from './routes/orders/index.js';
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
+// const cors = require('cors');
 const app = express();
+
+
 app.use(urlencoded({ extended: false }));
 app.use(json());
+
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 
 
 app.get('/', (req, res) => {
