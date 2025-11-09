@@ -26,7 +26,7 @@ export async function createPaymentIntent(req: Request, res: Response) {
 
     const ephemeralKey = await stripe.ephemeralKeys.create(
         { customer: customer.id },
-        // {apiVersion: '2024-09-30.acacia'}
+        {apiVersion: '2025-10-29.clover'}
     );
 
     //  TODO Calculate the amount dynamically
