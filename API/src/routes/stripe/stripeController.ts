@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
+import { db } from '../../db/index.js';
 import Stripe from 'stripe';
+import { ordersTable } from "../../db/ordersSchema.js";
+import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -9,7 +12,9 @@ export async function getKeys(req: Request, res: Response) {
 
 export async function createPaymentIntent(req: Request, res: Response) {
     const {orderId} = req.body;
-    console.log(orderId);
+    const order = await db.select().from(ordersTable).where(eq(ordersTable.id , orderId));
+
+    console.log(order);
     // TODO: Add info about the Customer
     const customer = await stripe.customers.create();
     const customerSession = await stripe.customerSessions.create({
