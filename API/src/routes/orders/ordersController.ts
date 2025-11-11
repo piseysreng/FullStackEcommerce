@@ -7,7 +7,6 @@ export async function createOrder(req: Request, res: Response) {
     try {
         const userId = req.userId;
         const items = req.body.items;
-        console.log(userId);
         if (!userId) {
             res.status(400).json({ message: 'No User Id' });
         }
