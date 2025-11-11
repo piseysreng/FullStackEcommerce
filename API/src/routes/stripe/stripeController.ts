@@ -14,8 +14,10 @@ export async function createPaymentIntent(req: Request, res: Response) {
     const {orderId} = req.body;
     const order = await db.select().from(ordersTable).where(eq(ordersTable.id , orderId));
     const orderItems = await db.select().from(orderItemsTable).where(eq(orderItemsTable.orderId, orderId));
+    // Calculate Total Sum of Order
+    const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    console.log(orderItems);
+    console.log(total);
     // TODO: Add info about the Customer
     const customer = await stripe.customers.create();
     const customerSession = await stripe.customerSessions.create({
