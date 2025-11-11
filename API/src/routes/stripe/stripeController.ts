@@ -8,6 +8,8 @@ export async function getKeys(req: Request, res: Response) {
 }
 
 export async function createPaymentIntent(req: Request, res: Response) {
+    const {orderId} = req.body;
+    console.log(orderId);
     // TODO: Add info about the Customer
     const customer = await stripe.customers.create();
     const customerSession = await stripe.customerSessions.create({

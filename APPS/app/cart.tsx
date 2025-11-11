@@ -6,7 +6,7 @@ import { HStack } from '@/components/ui/hstack';
 import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
-import { Redirect } from 'expo-router';
+import { Redirect, router, useRouter } from 'expo-router';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createOrder } from '@/api/orders';
 import { createPaymentIntent } from '@/api/stripe';
@@ -16,6 +16,7 @@ export default function CartScreen() {
     const items = useCart((state) => state.items);
     const resetCart = useCart(state => state.resetCart);
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
+    const router = useRouter();
 
     const paymentIntentMutation = useMutation({
         mutationFn: createPaymentIntent,
@@ -41,9 +42,9 @@ export default function CartScreen() {
         onError: (error) => { console.log(error) },
     });
     // console.log(paymentIntent);
-    useEffect(() => {
-        paymentIntentMutation.mutate();
-    }, []);
+    // useEffect(() => {
+    //     paymentIntentMutation.mutate();
+    // }, []);
 
     const createOrderMutation = useMutation({
         mutationFn: () => createOrder(
@@ -54,7 +55,10 @@ export default function CartScreen() {
             }))
         ),
         onSuccess: (data) => {
-            resetCart();
+            console.log(data);
+            paymentIntentMutation.mutate({orderId : data.id});
+            // resetCart();
+            // router.push(`/orders/${data.id}`);
         },
         onError: (error) => { console.log(error) },
     });
@@ -72,7 +76,11 @@ export default function CartScreen() {
 
     // console.log(items);
     const onCheckOut = async () => {
-        openPaymentSheet();
+        // Create Order to get the ID first
+        createOrderMutation.mutateAsync();
+        
+
+        // openPaymentSheet();
         // Sent Order to Server
         // createOrderMutation.mutate();
 
