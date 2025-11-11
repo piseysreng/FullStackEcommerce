@@ -16,6 +16,7 @@ export async function createPaymentIntent(req: Request, res: Response) {
     const orderItems = await db.select().from(orderItemsTable).where(eq(orderItemsTable.orderId, orderId));
     // Calculate Total Sum of Order
     const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const amount = Math.round(total * 100);
 
     console.log(total);
     // TODO: Add info about the Customer
@@ -42,8 +43,8 @@ export async function createPaymentIntent(req: Request, res: Response) {
     //  TODO Calculate the amount dynamically
 
     const paymentIntent = await stripe.paymentIntents.create({
-        amount: 1099,
-        currency: 'eur',
+        amount: amount,
+        currency: 'usd',
         customer: customer.id,
         automatic_payment_methods: {
             enabled: true,
