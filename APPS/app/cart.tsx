@@ -46,7 +46,7 @@ export default function CartScreen() {
                 defaultBillingDetails: {
                     name: 'Jane Doe',
                 },
-                returnURL: 'your-app-scheme://'
+                // returnURL: 'your-app-scheme://'
             });
             if (error) {
                 Alert.alert('Error', error.message);

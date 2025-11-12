@@ -50,6 +50,13 @@
       "when": 1761619172774,
       "tag": "0006_complete_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1762934636987,
+      "tag": "0007_first_pestilence",
+      "breakpoints": true
     }
   ]
 }

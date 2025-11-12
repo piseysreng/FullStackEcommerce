@@ -43,8 +43,6 @@ export async function createPaymentIntent(req: Request, res: Response) {
         { apiVersion: '2025-10-29.clover' }
     );
 
-    //  TODO Calculate the amount dynamically
-
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: 'usd',
@@ -53,6 +51,9 @@ export async function createPaymentIntent(req: Request, res: Response) {
             enabled: true,
         },
     });
+
+    // Todo Store PaymentIntentId in the Order Database
+    await db.update(ordersTable).set({stripePaymentIntentId: paymentIntent.id}).where(eq(ordersTable.id, orderId));
 
     res.json({
         paymentIntent: paymentIntent.client_secret,
@@ -64,10 +65,7 @@ export async function createPaymentIntent(req: Request, res: Response) {
 }
 
 export async function webhook(req: Request, res: Response) {
-    console.log(req.body);
     const event = req.body;
-
-
 
     // Handle the event
     switch (event.type) {
