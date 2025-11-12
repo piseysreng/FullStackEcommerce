@@ -71,8 +71,13 @@ export async function webhook(req: Request, res: Response) {
     switch (event.type) {
         case 'payment_intent.succeeded':
             const paymentIntent = event.data.object;
+            await db.update(ordersTable).set({status: 'payed'}).where(eq(ordersTable.stripePaymentIntentId, paymentIntent.id));
             // Then define and call a method to handle the successful payment intent.
             // handlePaymentIntentSucceeded(paymentIntent);
+            break;
+        case 'payment_intent.failed': 
+            const paymentIntentFailed = event.data.object;
+            await db.update(ordersTable).set({status: 'payment_failed'}).where(eq(ordersTable.stripePaymentIntentId, paymentIntentFailed.id));
             break;
         case 'payment_method.attached':
             const paymentMethod = event.data.object;
