@@ -18,6 +18,19 @@ export default function CartScreen() {
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const router = useRouter();
 
+    const openPaymentSheet = async () => {
+        const { error } = await presentPaymentSheet();
+
+        if (error) {
+            Alert.alert(`Error code: ${error.code}`, error.message);
+            // ToDo: handle Error. The order is submitted, but payment failed.
+        } else {
+            Alert.alert('Success', 'Your order is confirmed!');
+            resetCart();
+            router.replace('/');
+        }
+    };
+
     const paymentIntentMutation = useMutation({
         mutationFn: createPaymentIntent,
         onSuccess: async (data) => {
@@ -32,12 +45,14 @@ export default function CartScreen() {
                 allowsDelayedPaymentMethods: true,
                 defaultBillingDetails: {
                     name: 'Jane Doe',
-                }
+                },
+                returnURL: 'your-app-scheme://'
             });
             if (error) {
                 Alert.alert('Error', error.message);
                 console.log(error);
-            }
+            };
+            openPaymentSheet();
         },
         onError: (error) => { console.log(error) },
     });
@@ -45,6 +60,8 @@ export default function CartScreen() {
     // useEffect(() => {
     //     paymentIntentMutation.mutate();
     // }, []);
+
+    
 
     const createOrderMutation = useMutation({
         mutationFn: () => createOrder(
@@ -55,7 +72,6 @@ export default function CartScreen() {
             }))
         ),
         onSuccess: (data) => {
-            console.log(data);
             paymentIntentMutation.mutate({orderId : data.id});
             // resetCart();
             // router.push(`/orders/${data.id}`);
@@ -64,15 +80,7 @@ export default function CartScreen() {
     });
 
 
-    const openPaymentSheet = async () => {
-        const { error } = await presentPaymentSheet();
-
-        if (error) {
-            Alert.alert(`Error code: ${error.code}`, error.message);
-        } else {
-            Alert.alert('Success', 'Your order is confirmed!');
-        }
-    };
+    
 
     // console.log(items);
     const onCheckOut = async () => {

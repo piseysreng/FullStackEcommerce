@@ -16,9 +16,12 @@ export async function createPaymentIntent(req: Request, res: Response) {
     const orderItems = await db.select().from(orderItemsTable).where(eq(orderItemsTable.orderId, orderId));
     // Calculate Total Sum of Order
     const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const amount = Math.round(total * 100);
+    const amount = Math.floor(total * 100);
 
-    console.log(total);
+    if (amount === 0) {
+        res.status(400).json({ message: 'Order total is 0 Can not complete'});
+        return ;
+    }
     // TODO: Add info about the Customer
     const customer = await stripe.customers.create();
     const customerSession = await stripe.customerSessions.create({
@@ -58,4 +61,9 @@ export async function createPaymentIntent(req: Request, res: Response) {
         customer: customer.id,
         publishableKey: process.env.STRIPE_PUBLISABLE_KEY,
     });
+}
+
+export async function webhook (req: Request, res: Response){
+    console.log(req.body);
+    res.json({message: 'Webhook Received'});
 }
