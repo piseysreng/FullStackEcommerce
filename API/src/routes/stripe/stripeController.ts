@@ -72,6 +72,30 @@ export async function webhook(req: Request, res: Response) {
 
     try {
         event = stripe.webhooks.constructEvent(req.rawBody!, sig!, endpointSecret);
+
+
+        switch (event.type) {
+            case 'payment_intent.succeeded':
+                const paymentIntent = event.data.object;
+                await db.update(ordersTable).set({ status: 'payed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntent.id));
+                // Then define and call a method to handle the successful payment intent.
+                // handlePaymentIntentSucceeded(paymentIntent);
+                break;
+            case 'payment_intent.payment_failed':
+                const paymentIntentFailed = event.data.object;
+                await db.update(ordersTable).set({ status: 'payment_failed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntentFailed.id));
+                break;
+            case 'payment_method.attached':
+                const paymentMethod = event.data.object;
+                // Then define and call a method to handle the successful attachment of a PaymentMethod.
+                // handlePaymentMethodAttached(paymentMethod);
+                break;
+            // ... handle other event types
+            default:
+                console.log(`Unhandled event type ${event.type}`);
+        }
+
+        res.json({ recieved: true });
     }
     catch (err) {
         res.status(400).send(`Webhook Error: ${(err as Error).message}`);
@@ -79,32 +103,30 @@ export async function webhook(req: Request, res: Response) {
 
     // const event = req.body;
 
-
-
     // Handle the event
-    switch (event.type) {
-        case 'payment_intent.succeeded':
-            const paymentIntent = event.data.object;
-            await db.update(ordersTable).set({ status: 'payed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntent.id));
-            // Then define and call a method to handle the successful payment intent.
-            // handlePaymentIntentSucceeded(paymentIntent);
-            break;
-        case 'payment_intent.payment_failed':
-            const paymentIntentFailed = event.data.object;
-            await db.update(ordersTable).set({ status: 'payment_failed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntentFailed.id));
-            break;
-        case 'payment_method.attached':
-            const paymentMethod = event.data.object;
-            // Then define and call a method to handle the successful attachment of a PaymentMethod.
-            // handlePaymentMethodAttached(paymentMethod);
-            break;
-        // ... handle other event types
-        default:
-            console.log(`Unhandled event type ${event.type}`);
-    }
+    // switch (event.type) {
+    //     case 'payment_intent.succeeded':
+    //         const paymentIntent = event.data.object;
+    //         await db.update(ordersTable).set({ status: 'payed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntent.id));
+    //         // Then define and call a method to handle the successful payment intent.
+    //         // handlePaymentIntentSucceeded(paymentIntent);
+    //         break;
+    //     case 'payment_intent.payment_failed':
+    //         const paymentIntentFailed = event.data.object;
+    //         await db.update(ordersTable).set({ status: 'payment_failed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntentFailed.id));
+    //         break;
+    //     case 'payment_method.attached':
+    //         const paymentMethod = event.data.object;
+    //         // Then define and call a method to handle the successful attachment of a PaymentMethod.
+    //         // handlePaymentMethodAttached(paymentMethod);
+    //         break;
+    //     // ... handle other event types
+    //     default:
+    //         console.log(`Unhandled event type ${event.type}`);
+    // }
 
     // Return a response to acknowledge receipt of the event
 
 
-    res.json({ recieved: true });
+    
 }
