@@ -1,4 +1,4 @@
-import express, { json, urlencoded } from 'express';
+import express, { json, urlencoded, Request } from 'express';
 import cors from 'cors';
 import productsRoutes from './routes/products/index.js';
 import authRoutes from './routes/auth/index.js';
@@ -11,7 +11,11 @@ const app = express();
 
 
 app.use(urlencoded({ extended: false }));
-app.use(json());
+app.use(json({
+  verify: (req: Request, res, buf) => {
+    req.rawBody = buf;
+  },
+}));
 
 app.use(cors({
   origin: 'http://localhost:3000'
