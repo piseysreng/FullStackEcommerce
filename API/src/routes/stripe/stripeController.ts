@@ -5,6 +5,7 @@ import { orderItemsTable, ordersTable } from "../../db/ordersSchema.js";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET!;
 
 export async function getKeys(req: Request, res: Response) {
     res.json({ publishableKey: process.env.STRIPE_PUBLISABLE_KEY });
@@ -53,7 +54,7 @@ export async function createPaymentIntent(req: Request, res: Response) {
     });
 
     // Todo Store PaymentIntentId in the Order Database
-    await db.update(ordersTable).set({stripePaymentIntentId: paymentIntent.id}).where(eq(ordersTable.id, orderId));
+    await db.update(ordersTable).set({ stripePaymentIntentId: paymentIntent.id }).where(eq(ordersTable.id, orderId));
 
     res.json({
         paymentIntent: paymentIntent.client_secret,
@@ -65,19 +66,32 @@ export async function createPaymentIntent(req: Request, res: Response) {
 }
 
 export async function webhook(req: Request, res: Response) {
-    const event = req.body;
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig!, endpointSecret);
+    }
+    catch (err) {
+        res.status(400).send(`Webhook Error: ${(err as Error).message}`);
+    };
+
+    // const event = req.body;
+
+
 
     // Handle the event
     switch (event.type) {
         case 'payment_intent.succeeded':
             const paymentIntent = event.data.object;
-            await db.update(ordersTable).set({status: 'payed'}).where(eq(ordersTable.stripePaymentIntentId, paymentIntent.id));
+            await db.update(ordersTable).set({ status: 'payed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntent.id));
             // Then define and call a method to handle the successful payment intent.
             // handlePaymentIntentSucceeded(paymentIntent);
             break;
-        case 'payment_intent.failed': 
+        case 'payment_intent.payment_failed':
             const paymentIntentFailed = event.data.object;
-            await db.update(ordersTable).set({status: 'payment_failed'}).where(eq(ordersTable.stripePaymentIntentId, paymentIntentFailed.id));
+            await db.update(ordersTable).set({ status: 'payment_failed' }).where(eq(ordersTable.stripePaymentIntentId, paymentIntentFailed.id));
             break;
         case 'payment_method.attached':
             const paymentMethod = event.data.object;
