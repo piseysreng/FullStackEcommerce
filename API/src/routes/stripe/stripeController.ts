@@ -11,16 +11,16 @@ export async function getKeys(req: Request, res: Response) {
 }
 
 export async function createPaymentIntent(req: Request, res: Response) {
-    const {orderId} = req.body;
-    const order = await db.select().from(ordersTable).where(eq(ordersTable.id , orderId));
+    const { orderId } = req.body;
+    const order = await db.select().from(ordersTable).where(eq(ordersTable.id, orderId));
     const orderItems = await db.select().from(orderItemsTable).where(eq(orderItemsTable.orderId, orderId));
     // Calculate Total Sum of Order
     const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const amount = Math.floor(total * 100);
 
     if (amount === 0) {
-        res.status(400).json({ message: 'Order total is 0 Can not complete'});
-        return ;
+        res.status(400).json({ message: 'Order total is 0 Can not complete' });
+        return;
     }
     // TODO: Add info about the Customer
     const customer = await stripe.customers.create();
@@ -40,7 +40,7 @@ export async function createPaymentIntent(req: Request, res: Response) {
 
     const ephemeralKey = await stripe.ephemeralKeys.create(
         { customer: customer.id },
-        {apiVersion: '2025-10-29.clover'}
+        { apiVersion: '2025-10-29.clover' }
     );
 
     //  TODO Calculate the amount dynamically
@@ -63,7 +63,31 @@ export async function createPaymentIntent(req: Request, res: Response) {
     });
 }
 
-export async function webhook (req: Request, res: Response){
+export async function webhook(req: Request, res: Response) {
     console.log(req.body);
-    res.json({message: 'Webhook Received'});
+    const event = req.body;
+
+
+
+    // Handle the event
+    switch (event.type) {
+        case 'payment_intent.succeeded':
+            const paymentIntent = event.data.object;
+            // Then define and call a method to handle the successful payment intent.
+            // handlePaymentIntentSucceeded(paymentIntent);
+            break;
+        case 'payment_method.attached':
+            const paymentMethod = event.data.object;
+            // Then define and call a method to handle the successful attachment of a PaymentMethod.
+            // handlePaymentMethodAttached(paymentMethod);
+            break;
+        // ... handle other event types
+        default:
+            console.log(`Unhandled event type ${event.type}`);
+    }
+
+    // Return a response to acknowledge receipt of the event
+
+
+    res.json({ recieved: true });
 }
